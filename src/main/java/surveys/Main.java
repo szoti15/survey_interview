@@ -12,6 +12,7 @@ public class Main {
         SurveyController surveyController = new SurveyController();
 
         System.out.println(surveyController.getMembersWithStatus(15, COMPLETED));
+        System.out.println(surveyController.getSurveysByMemberAndStatus(15, COMPLETED));
 
 
     }

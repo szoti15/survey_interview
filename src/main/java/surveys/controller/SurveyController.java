@@ -45,15 +45,17 @@ public class SurveyController {
     private GetParticipation getParticipation = new GetParticipation();
     private GetStatus getStatus = new GetStatus();
     private GetMembers getMembers = new GetMembers();
+    private GetSurveys getSurveys = new GetSurveys();
 
     List<Participation> participations;
     Map<Integer, Members> members;
     Map<Integer, Statuses> statuses;
+    Map<Integer, Surveys> surveys;
 
     public List<Members> getMembersWithStatus(int surveyId, String statusName){
-        Statuses completed = getStatusByName(statusName);
+        Statuses status = getStatusByName(statusName);
 
-        if(completed == null) {
+        if(status == null) {
             System.out.println("Nincs ilyen status " + statusName);
             return Collections.emptyList();
         }
@@ -63,10 +65,29 @@ public class SurveyController {
 
         return participations.stream()
                 .filter(p -> p.getSurveyId() == surveyId)
-                .filter(p -> p.getStatusId() == completed.statusId)
+                .filter(p -> p.getStatusId() == status.statusId)
                 .map(p -> storedMembers.get(p.getMemberId()))
                 .collect(Collectors.toList());
     }
+
+    // b) Adott személy által kitöltött (Completed státuszú) kérdőívek listája
+    public List<Surveys> getSurveysByMemberAndStatus(int memberId, String statusName) {
+        Statuses status = getStatusByName(statusName);
+
+        if(status == null) {
+            System.out.println("Nincs ilyen status " + statusName);
+            return Collections.emptyList();
+        }
+
+        Map<Integer, Surveys> surveys = getSurveys();
+
+        return getParticipations().stream()
+                .filter(p -> p.getMemberId() == memberId)
+                .filter(p -> p.getStatusId() == status.statusId)
+                .map( p -> surveys.get(p.getSurveyId()))
+                .collect(Collectors.toList());
+    }
+
 
     private List<Participation> getParticipations(){
         if(participations == null) {
@@ -91,11 +112,19 @@ public class SurveyController {
         return statuses;
     }
 
-    private Map<Integer, Members>  getMembers(){
+    private Map<Integer, Members> getMembers(){
         if(members == null){
             members = getMembers.getMembers();
         }
 
         return members;
+    }
+
+    private Map<Integer, Surveys> getSurveys(){
+        if(surveys == null){
+            surveys = getSurveys.getSurveys();
+        }
+
+        return surveys;
     }
 }

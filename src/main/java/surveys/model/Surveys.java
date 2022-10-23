@@ -18,12 +18,12 @@ public class Surveys {
 
     @Override
     public String toString() {
-        return "Surveys{" +
-                "surveyId=" + surveyId +
+        return "{" +
+                "id=" + surveyId +
                 ", Name='" + Name + '\'' +
                 ", expectedCompletes=" + expectedCompletes +
                 ", completionPoints=" + completionPoints +
                 ", filteredPoints=" + filteredPoints +
-                '}';
+                "}\n";
     }
 }
