@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class GetMembers {
     static final String MEMBER_FILE_PATH = "src/main/resources/surveys/Members.csv";
-   // GeneralFileReader reader = new GeneralFileReader(MEMBER_FILE_PATH);
+
 
     public Map<Integer, Members> getMembers(){
         Map<Integer,Members> members = new HashMap<>();

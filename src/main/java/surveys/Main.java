@@ -1,9 +1,6 @@
 package surveys;
 
-
 import surveys.controller.SurveyController;
-import surveys.dao.*;
-
 
 public class Main {
     private static final String COMPLETED = "Completed";

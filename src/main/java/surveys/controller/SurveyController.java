@@ -131,8 +131,6 @@ public class SurveyController {
 
     // e) Összes kérdőív listázása, statisztikákkal:
     // Kérdőív azonosító, Kérdőív neve, Kitöltők száma, Kiszűrtek száma, Kérdőívet elutasítók száma, Átlagos kitöltési hossz
-
-    // surveys (id, name) -> az adott survey kellene nekem a participations (kitolto szam, kiszurtek szama, elutasitok szama, avg hossz)
     public List<SurveyStatistics> getSurveyStatistics() {
         List<SurveyStatistics> statistics = new ArrayList<>();
 

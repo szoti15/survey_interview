@@ -1,1 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'groovy'
+compileJava.options.encoding = 'UTF-8'
+
+repositories{
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.12'
+    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+}
