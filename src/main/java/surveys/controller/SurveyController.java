@@ -114,6 +114,20 @@ public class SurveyController {
         return point;
     }
 
+    //d) Adott kérdőívre meghívható (Még nem vett részt ebben a felmérésben és státusza aktív) személyek listázása
+    public List<Members> getNonParticipiants(int surveyId){
+
+        List<Integer> memberIds = getParticipationsBySurveyId(surveyId)
+                .stream()
+                .map(Participation::getMemberId)
+                .collect(Collectors.toList());
+
+        return getMembers().values().stream()
+                .filter(m -> !memberIds.contains(m.memberId))
+                .filter(m -> m.isActive)
+                .collect(Collectors.toList());
+    }
+
     private void fillParticipations(){
         if(participations == null) {
             participations = getParticipation.getParticipation();
