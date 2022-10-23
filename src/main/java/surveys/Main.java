@@ -13,6 +13,7 @@ public class Main {
 
         System.out.println(surveyController.getMembersWithStatus(15, COMPLETED));
         System.out.println(surveyController.getSurveysByMemberAndStatus(15, COMPLETED));
+        System.out.println(surveyController.getPointsOfMember(15));
 
 
     }

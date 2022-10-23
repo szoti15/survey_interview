@@ -36,22 +36,26 @@ Megjegyzés: Minden számítást Java-ban végezzünk el!
 import surveys.dao.*;
 import surveys.model.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SurveyController {
+    private static final String COMPLETED = "Completed";
+    private static final String FILTERED = "Filtered";
+
     private GetParticipation getParticipation = new GetParticipation();
     private GetStatus getStatus = new GetStatus();
     private GetMembers getMembers = new GetMembers();
     private GetSurveys getSurveys = new GetSurveys();
 
     List<Participation> participations;
+    Map<Integer, List<Participation>> participationsByMember;
+    Map<Integer, List<Participation>> participationsBySurveyId;
     Map<Integer, Members> members;
     Map<Integer, Statuses> statuses;
     Map<Integer, Surveys> surveys;
 
+    //a) Adott kérdőívet kitöltők (Completed státuszúak) listája
     public List<Members> getMembersWithStatus(int surveyId, String statusName){
         Statuses status = getStatusByName(statusName);
 
@@ -60,11 +64,9 @@ public class SurveyController {
             return Collections.emptyList();
         }
 
-        List<Participation> participations = getParticipations();
         Map<Integer, Members> storedMembers = getMembers();
 
-        return participations.stream()
-                .filter(p -> p.getSurveyId() == surveyId)
+        return getParticipationsBySurveyId(surveyId).stream()
                 .filter(p -> p.getStatusId() == status.statusId)
                 .map(p -> storedMembers.get(p.getMemberId()))
                 .collect(Collectors.toList());
@@ -81,20 +83,69 @@ public class SurveyController {
 
         Map<Integer, Surveys> surveys = getSurveys();
 
-        return getParticipations().stream()
-                .filter(p -> p.getMemberId() == memberId)
+        return getParticipationsByMember(memberId).stream()
                 .filter(p -> p.getStatusId() == status.statusId)
                 .map( p -> surveys.get(p.getSurveyId()))
                 .collect(Collectors.toList());
     }
 
+    //c) Adott személy által eddig gyűjtött pontok lekérdezése
+    public Points getPointsOfMember(int memberId) {
+        Statuses completed = getStatusByName(COMPLETED);
+        Statuses filtered = getStatusByName(FILTERED);
 
-    private List<Participation> getParticipations(){
-        if(participations == null) {
-            participations = getParticipation.getParticipation();
+        List<Participation> participations = getParticipationsByMember(memberId).stream()
+                .filter(p -> p.getStatusId() == completed.statusId || p.getStatusId() == filtered.statusId)
+                .collect(Collectors.toList());
+
+        Points point = new Points();
+        Map<Integer, Surveys> surveys = getSurveys();
+
+        for(Participation p : participations) {
+            Surveys survey = surveys.get(p.getSurveyId());
+
+            if(p.getStatusId() == completed.statusId){
+                point.completionPoints += survey.completionPoints;
+            } else if(p.getStatusId() == filtered.statusId){
+                point.filteredPoints += survey.filteredPoints;
+            }
         }
 
-        return participations;
+        return point;
+    }
+
+    private void fillParticipations(){
+        if(participations == null) {
+            participations = getParticipation.getParticipation();
+
+            participationsByMember = new HashMap<>();
+            participationsBySurveyId = new HashMap<>();
+            for(Participation p : participations) {
+                participationsByMember
+                        .computeIfAbsent(p.getMemberId(), k -> new ArrayList<>())
+                        .add(p);
+
+                participationsBySurveyId
+                        .computeIfAbsent(p.getSurveyId(), k -> new ArrayList<>())
+                        .add(p);
+            }
+        }
+    }
+
+    private List<Participation> getParticipationsByMember(int memberId){
+        if(participationsByMember == null) {
+            fillParticipations();
+        }
+
+        return participationsByMember.get(memberId);
+    }
+
+    private List<Participation> getParticipationsBySurveyId(int surveyId){
+        if(participationsBySurveyId == null) {
+            fillParticipations();
+        }
+
+        return participationsBySurveyId.get(surveyId);
     }
 
     private Statuses getStatusByName(String name){
