@@ -18,11 +18,11 @@ public class Members {
 
     @Override
     public String toString() {
-        return "Members{" +
-                "memberId=" + memberId +
-                ", fullName='" + fullName + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
+        return "{" +
+                "id=" + memberId +
+                ", name='" + fullName + '\'' +
+                //", email='" + emailAddress + '\'' +
                 ", isActive=" + isActive +
-                '}';
+                "}\n";
     }
 }

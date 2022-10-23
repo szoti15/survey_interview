@@ -1,22 +1,18 @@
 package surveys;
 
 
+import surveys.controller.SurveyController;
 import surveys.dao.*;
 
 
 public class Main {
+    private static final String COMPLETED = "Completed";
 
     public static void main(String[] args) {
-        GetMembers members = new GetMembers();
-        System.out.println(members.getMembers());
+        SurveyController surveyController = new SurveyController();
 
-        GetParticipation participation = new GetParticipation();
-        System.out.println(participation.getParticipation());
+        System.out.println(surveyController.getMembersWithStatus(15, COMPLETED));
 
-        GetStatus status = new GetStatus();
-        System.out.println(status.getStatus());
 
-        GetSurveys surveys = new GetSurveys();
-        System.out.println(surveys.getSurveys());
     }
 }
