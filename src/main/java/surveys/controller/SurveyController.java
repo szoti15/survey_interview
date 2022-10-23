@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 public class SurveyController {
     private static final String COMPLETED = "Completed";
     private static final String FILTERED = "Filtered";
+    private static final String REJECTED = "Rejected";
 
     private GetParticipation getParticipation = new GetParticipation();
     private GetStatus getStatus = new GetStatus();
@@ -126,6 +127,45 @@ public class SurveyController {
                 .filter(m -> !memberIds.contains(m.memberId))
                 .filter(m -> m.isActive)
                 .collect(Collectors.toList());
+    }
+
+    // e) Összes kérdőív listázása, statisztikákkal:
+    // Kérdőív azonosító, Kérdőív neve, Kitöltők száma, Kiszűrtek száma, Kérdőívet elutasítók száma, Átlagos kitöltési hossz
+
+    // surveys (id, name) -> az adott survey kellene nekem a participations (kitolto szam, kiszurtek szama, elutasitok szama, avg hossz)
+    public List<SurveyStatistics> getSurveyStatistics() {
+        List<SurveyStatistics> statistics = new ArrayList<>();
+
+        Statuses completed = getStatusByName(COMPLETED);
+        Statuses filtered = getStatusByName(FILTERED);
+        Statuses rejected = getStatusByName(REJECTED);
+
+        for(Surveys survey : getSurveys().values()){
+            SurveyStatistics statistic = new SurveyStatistics();
+
+            statistic.surveyId = survey.surveyId;
+            statistic.surveyName = survey.Name;
+
+            List<Participation> participations = getParticipationsBySurveyId(survey.surveyId);
+
+            int sumLength = 0;
+            for(Participation p : participations){
+
+               if(p.getStatusId() == completed.statusId) {
+                   sumLength += p.getLength();
+                   statistic.numbOfCompleted += 1;
+               } else if (p.getStatusId() == filtered.statusId){
+                   statistic.numbOfFiltered += 1;
+               } else if (p.getStatusId() == rejected.statusId){
+                   statistic.numbOfRejected += 1;
+               }
+            }
+
+            statistic.avgLength = sumLength / statistic.numbOfCompleted;
+            statistics.add(statistic);
+        }
+
+        return statistics;
     }
 
     private void fillParticipations(){
